@@ -91,10 +91,10 @@ iob_before_restore_commands:
 ```yaml
 iob_use_custom_cert: false
 ```
-Experimental. If you set this to `true`, the role will create `{{iob_dir}}/ssl` and upload a certificate and a private key supplied in the `files` directory in the playbook folder.
+Experimental. If you set this to `true`, the role will create `/opt/ssl` and upload a certificate and a private key supplied in the `files` directory in the playbook folder.
 
 ```yaml
-iob_cert_folder: "{{iob_dir}}/ssl"
+iob_cert_folder: "/opt/ssl"
 ```
 The folder where the certificate and private key will be copied to. You can change this if you want to.
 

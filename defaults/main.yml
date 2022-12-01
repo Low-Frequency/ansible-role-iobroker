@@ -46,7 +46,7 @@ iob_before_restore_commands:
 ### setup custom certificates
 ### the certificates have to be manually set up in the admin config
 iob_use_custom_cert: false
-iob_cert_folder: "{{iob_dir}}/ssl"
+iob_cert_folder: "/opt/ssl"
 iob_cert_file: "iobroker.crt"
 iob_private_key_file: "iobroker.key"
 

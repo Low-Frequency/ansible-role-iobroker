@@ -44,9 +44,9 @@
   file:
     state: directory
     path: "{{iob_cert_folder}}"
-    owner: root
-    group: root
-    mode: 0674
+    owner: "{{iob_user}}"
+    group: "{{iob_group}}"
+    mode: 0755
   become: true
   when: iob_use_custom_cert | bool
 
@@ -66,6 +66,6 @@
     dest: "{{iob_cert_folder}}/{{iob_private_key_file}}"
     owner: "{{iob_user}}"
     group: "{{iob_group}}"
-    mode: 0644
+    mode: 0440
   become: true
   when: iob_use_custom_cert | bool
