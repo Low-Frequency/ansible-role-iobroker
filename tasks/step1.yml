@@ -1,0 +1,24 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  become: true
+
+- name: Install Required Packages
+  apt:
+    name:
+      - "{{item}}"
+    state: present
+  become: true
+  with_items: "{{iob_required_packages}}"
+
+- name: Create systemd file
+  template:
+    src: iob.service.j2
+    dest: "/lib/systemd/system/{{iob_service}}.service"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  become: true
+  notify: restart_iobroker

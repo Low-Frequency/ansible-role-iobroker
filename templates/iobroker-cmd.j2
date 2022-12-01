@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+if (( $# == 1 )) && ([ "$1" = "start" ] || [ "$1" = "stop" ] || [ "$1" = "restart" ]); then
+sudo systemctl $1 {{iob_service}}
+elif [ "$1" = "fix" ]; then
+curl -sL https://iobroker.net/fix.sh | bash -
+else
+sudo -H -u {{iob_user}} node {{iob_controller_dir}}/iobroker.js "$@"
+fi

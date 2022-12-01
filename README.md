@@ -1,92 +1,135 @@
-# ioBroker
+# Ansible Role: ioBroker
 
+Installs ioBroker on Debian/Ubuntu systems.
 
+## Requirements
 
-## Getting started
+Node.js and npm have to be installed first. The easiest way to do this is to include [geerlingguy.nodejs](https://github.com/geerlingguy/ansible-role-nodejs) in the playbook.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Role Variables
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Avaliable variables are listed below, along with default values (see [defaults/main.yml](defaults/main.yml)):
 
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
+```yaml
+iob_dir: "/opt/iobroker"
 ```
-cd existing_repo
-git remote add origin https://192.168.178.230/infrastructure/ansible/roles/iobroker.git
-git branch -M main
-git push -uf origin main
+The directory where ioBroker will be installed in. You shouldn't have to change this, but you can if you want. `iob_controller_dir` is relative to this directory and should not be changed.
+
+```yaml
+iob_user: "iobroker"
+```
+The user ioBroker gets executed as. Feel free to change this as you wish.
+`iob_group` defaults to this value and shouldn't be changed.
+
+```yaml
+iob_groups:
+  - audio
+  - dialout
+  - tty
+  - video
+```
+The groups which the `iob_user` will be added to. These groups should suffice for most installations, but depending on your setup you might have to add some groups here. The default groups from the install script are as follows:
+```
+audio
+bluetooth
+dialout
+gpio
+i2c
+redis
+tty
+video
 ```
 
-## Integrate with your tools
+```yaml
+iob_service: "iobroker"
+```
+The name of the service ioBroker gets executed as. You might break something if you change this, but feel free to try it out.
 
-- [ ] [Set up project integrations](https://192.168.178.230/infrastructure/ansible/roles/iobroker/-/settings/integrations)
+```yaml
+iob_cmd_links:
+  - "/usr/bin/iob"
+  - "/usr/bin/iobroker"
+```
+The global executables. Don't change them unless you know what you're doing.
 
-## Collaborate with your team
+```yaml
+iob_npm_registry: "https://registry.npmjs.org"
+```
+The default `npm` registry used by the install script.
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+```yaml
+iob_restore: false
+```
+Trigger variable for restoring a backup. You can use backups on the remote machine, or supply a backup via the `files` directory in the playbook folder.
 
-## Test and Deploy
+```yaml
+iob_use_local_backup: true
+```
+By default the restore will be done using a backup alredy located on the remote machine. Setting this to `false` will use a backup located in the `files` directory in the playbook folder.
 
-Use the built-in continuous integration in GitLab.
+```yaml
+iob_backup_name: "iobroker-backup.tar.gz"
+```
+The filename of the backup supplied in the `files` folder. You have to change this if you set `iob_use_local_backup: false` or rename your backup file to `iobroker-backup.tar.gz`.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+```yaml
+iob_date: "{{ansible_date_time.year}}_{{ansible_date_time.month}}_{{ansible_date_time.day}}"
+iob_time: "{{ansible_date_time.hour}}_{{ansible_date_time.minute}}_{{ansible_date_time.second}}"
+iob_backup_file: "iobroker_{{iob_date}}-{{iob_time}}_backupiobroker.tar.gz"
+```
+These are only to create a file name that is registeres as a valid backup by ioBroker. Don't change them.
 
-***
+```yaml
+iob_before_restore_commands:
+```
+A list of commands to execute before restoring the backup. You might need this if the restore doesn't work due to adapter version mismatches. If the playbook fails, it should give you the commands you need to set here. Example:
+```yaml
+iob_before_restore_commands:
+  - "npm i iobroker.js-controller@4.0.15 --production"
+```
 
-# Editing this README
+```yaml
+iob_use_custom_cert: false
+```
+Experimental. If you set this to `true`, the role will create `{{iob_dir}}/ssl` and upload a certificate and a private key supplied in the `files` directory in the playbook folder.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+```yaml
+iob_cert_folder: "{{iob_dir}}/ssl"
+```
+The folder where the certificate and private key will be copied to. You can change this if you want to.
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+```yaml
+iob_cert_file: "iobroker.crt"
+iob_private_key_file: "iobroker.key"
+```
+The names of the supplied certificate and private key files. Change them according to the files you want to use.
 
-## Name
-Choose a self-explaining name for your project.
+```yaml
+iob_required_packages:
+  - ...
+```
+I won't list the required packages here. It's only here to give a complete list of all variables used. You can add to this list if you want to install additional software, but don't remove anything from this list.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## Dependencies
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+Node.js and `npm` have to be installed before using this role. You can use [geerlingguy.nodejs](https://github.com/geerlingguy/ansible-role-nodejs) for this.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+## Example Playbook
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+```yaml
+---
+- name: Install ioBroker
+  hosts: iobroker
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+  roles:
+    - geerlingguy.nodejs
+    - iobroker
+```
 
 ## License
-For open source projects, say how it is licensed.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+MIT / BSD
+
+## Author Information
+
+This role was created in 2022 by [Low-Frequency](https://github.com/Low-Frequency).

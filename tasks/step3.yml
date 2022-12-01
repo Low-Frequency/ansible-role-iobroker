@@ -1,0 +1,71 @@
+---
+- name: Setup .npmrc for iob user
+  copy:
+    src: npmrc
+    dest: "{{iob_dir}}/.npmrc"
+    owner: "{{iob_user}}"
+    group: "{{iob_user}}"
+    mode: 0674
+  become: true
+
+- name: Setup package.json
+  copy:
+    src: package.json
+    dest: "{{iob_dir}}/package.json"
+    owner: "{{iob_user}}"
+    group: "{{iob_user}}"
+    mode: 0674
+  become: true
+
+- name: Install iobroker
+  npm:
+    name: "iobroker"
+    path: "{{iob_dir}}"
+    production: true
+    registry: "{{iob_npm_registry}}"
+    unsafe_perm: true
+  become: true
+  become_user: "{{iob_user}}"
+  environment:
+    AUTOMATED_INSTALLER: "true"
+
+- name: Install iobroker npm dependecies
+  npm:
+    path: "{{iob_dir}}"
+    production: true
+    registry: "{{iob_npm_registry}}"
+    unsafe_perm: true
+  become: true
+  become_user: "{{iob_user}}"
+  environment:
+    AUTOMATED_INSTALLER: "true"
+
+- name: Create SSL folder
+  file:
+    state: directory
+    path: "{{iob_cert_folder}}"
+    owner: root
+    group: root
+    mode: 0674
+  become: true
+  when: iob_use_custom_cert | bool
+
+- name: Copy Certificate
+  copy:
+    src: "{{playbook_dir}}/files/{{iob_cert_file}}"
+    dest: "{{iob_cert_folder}}/{{iob_cert_file}}"
+    owner: "{{iob_user}}"
+    group: "{{iob_group}}"
+    mode: 0644
+  become: true
+  when: iob_use_custom_cert | bool
+
+- name: Copy Private Key
+  copy:
+    src: "{{playbook_dir}}/files/{{iob_private_key_file}}"
+    dest: "{{iob_cert_folder}}/{{iob_private_key_file}}"
+    owner: "{{iob_user}}"
+    group: "{{iob_group}}"
+    mode: 0644
+  become: true
+  when: iob_use_custom_cert | bool

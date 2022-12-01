@@ -1,0 +1,26 @@
+galaxy_info:
+  role_name: iobroker
+  author: Low-Frequency
+  description: Installs ioBroker on Ubuntu and Debian systems
+  license: "license (BSD, MIT)"
+  min_ansible_version: "2.1"
+
+  platforms:
+  - name: Ubuntu
+    versions:
+      - focal
+      - bionic
+      - xenial
+  - name: Debian
+    versions:
+      - bullseye
+      - buster
+      - stretch
+
+  galaxy_tags:
+    - automation
+    - smarthome
+    - homeautomation
+    - iot
+
+dependencies: []

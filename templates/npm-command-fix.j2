@@ -1,0 +1,9 @@
+# While inside the iobroker directory, execute npm as {{iob_user}}
+function npm() {
+__real_npm=$(which npm)
+if [[ $(pwd) == "{{iob_dir}}"* ]]; then
+sudo -H -u {{iob_user}} $__real_npm $*
+else
+eval $__real_npm $*
+fi
+}

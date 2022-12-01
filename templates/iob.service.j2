@@ -1,0 +1,16 @@
+[Unit]
+Description=ioBroker Server
+Documentation=http://iobroker.net
+After=network.target redis.service influxdb.service mysql-server.service mariadb-server.service
+Wants=redis.service influxdb.service mysql-server.service mariadb-server.service
+
+[Service]
+Type=simple
+User={{iob_user}}
+Environment="NODE=$(which node)"
+ExecStart=/usr/bin/bash -c '${NODE} {{iob_controller_dir}}/controller.js'
+Restart=on-failure
+RestartSec=3s
+
+[Install]
+WantedBy=multi-user.target

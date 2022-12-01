@@ -1,0 +1,51 @@
+---
+- name: Stop iobroker
+  service:
+    name: iobroker
+    state: stopped
+  become: true
+
+- name: Make sure backup folder exists
+  file:
+    state: directory
+    path: "{{iob_dir}}/backups"
+    owner: "{{iob_user}}"
+    group: "{{iob_group}}"
+    mode: 0775
+  become: true
+
+- name: Copy backup to server
+  copy:
+    src: "{{playbook_dir}}/files/{{iob_backup_name}}"
+    dest: "{{iob_dir}}/backups/{{iob_backup_file}}"
+    owner: "{{iob_user}}"
+    group: "{{iob_group}}"
+    mode: 0664
+  become: true
+  when: not iob_use_local_backup | bool
+
+- name: Execute commands before restore
+  shell:
+    cmd: "{{item}}"
+    chdir: "{{iob_dir}}"
+  with_items: "{{iob_before_restore_commands}}"
+  become: true
+  become_user: "{{iob_user}}"
+  register: before_restore_command
+  changed_when: '"up to date" not in before_restore_command.stdout'
+
+- name: Restore backup
+  command:
+    cmd: iob restore 0
+    chdir: "{{iob_dir}}"
+  register: restore
+  become: true
+  become_user: "{{iob_user}}"
+  failed_when: '"System successfully restored!" not in restore.stdout'
+  changed_when: '"states restored" in restore.stdout or "objects restored" in restore.stdout'
+
+- name: Start iobroker
+  service:
+    name: iobroker
+    state: started
+  become: true

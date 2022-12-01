@@ -1,0 +1,16 @@
+---
+- name: Install Step 1/4
+  include_tasks: step1.yml
+
+- name: Install Step 2/4
+  include_tasks: step2.yml
+
+- name: Install Step 3/4
+  include_tasks: step3.yml
+
+- name: Install Step 4/4
+  include_tasks: step4.yml
+
+- name: Restore
+  include_tasks: step5.yml
+  when: iob_restore

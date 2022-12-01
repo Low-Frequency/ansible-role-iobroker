@@ -1,0 +1,6 @@
+# disable npm audit warnings
+audit=false
+# disable npm update-notifier information
+update-notifier=false
+# force strict version checks
+engine-strict=true

@@ -1,0 +1,80 @@
+---
+- name: setup iob executable
+  template:
+    src: iobroker-cmd.j2
+    dest: "{{iob_dir}}/iobroker"
+    owner: "{{iob_user}}"
+    group: "{{iob_group}}"
+    mode: 0775
+  become: true
+
+- name: Get status of iob file
+  stat:
+    path: "{{iob_dir}}/iob"
+  register: iob_file
+  become: true
+
+- name: Remove iob regular file
+  file:
+    state: absent
+    path: "{{iob_dir}}/iob"
+    owner: "{{iob_user}}"
+    group: "{{iob_group}}"
+    mode: 0777
+  become: true
+  when: iob_file.stat.isreg | bool
+
+- name: Create iob symlink
+  file:
+    state: link
+    src: "{{iob_dir}}/iobroker"
+    path: "{{iob_dir}}/iob"
+    owner: "{{iob_user}}"
+    group: "{{iob_group}}"
+    mode: 0777
+  become: true
+
+- name: Create iobroker symlinks
+  file:
+    state: link
+    src: "{{iob_dir}}/iobroker"
+    path: "{{item}}"
+    owner: "root"
+    group: "root"
+    mode: 0777
+  become: true
+  with_items: "{{iob_cmd_links}}"
+
+- name: Make sure .iobroker folder exists
+  file:
+    state: directory
+    path: "{{ansible_user_dir}}/.iobroker"
+    owner: "{{ansible_user}}"
+    group: "{{ansible_user}}"
+    mode: 0775
+  become: true
+
+- name: CLI completions
+  copy:
+    src: iobroker_completions
+    dest: "{{ansible_user_dir}}/.iobroker/iobroker_completions"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  become: true
+
+- name: NPM command fix
+  template:
+    src: npm-command-fix.j2
+    dest: "{{ansible_user_dir}}/.iobroker/npm_command_fix"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  become: true
+
+- name: Start iobroker
+  service:
+    name: "{{iob_service}}"
+    enabled: true
+    state: started
+  become: true

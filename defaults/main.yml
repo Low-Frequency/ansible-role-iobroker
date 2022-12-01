@@ -1,0 +1,77 @@
+### installation directory for iobroker
+iob_dir: "/opt/iobroker"
+iob_controller_dir: "{{iob_dir}}/node_modules/iobroker.js-controller"
+
+### iobroker system user and iob_groups
+iob_user: "iobroker"
+iob_group: "{{iob_user}}"
+iob_groups:
+  - audio
+  - dialout
+  - tty
+  - video
+
+### name of the iobroker service
+iob_service: "iobroker"
+
+### symlinks to create for global executables
+iob_cmd_links:
+  - "/usr/bin/iob"
+  - "/usr/bin/iobroker"
+
+### npm registry config
+### leave this as is
+iob_npm_registry: "https://registry.npmjs.org"
+
+### trigger restore
+### to restore a backup you have to put the backup file in the file folder
+### the name of the backup has to be iobroker-backup.tar.gz
+### if the file does not exist on the server set {{iob_local_backup}} to false
+### default behaviour is to restore the latest local backup
+iob_restore: false
+iob_use_local_backup: true
+iob_backup_name: "iobroker-backup.tar.gz"
+### leave this as is
+### create filename that is registered by iobroker as a valid backup
+iob_date: "{{ansible_date_time.year}}_{{ansible_date_time.month}}_{{ansible_date_time.day}}"
+iob_time: "{{ansible_date_time.hour}}_{{ansible_date_time.minute}}_{{ansible_date_time.second}}"
+iob_backup_file: "iobroker_{{iob_date}}-{{iob_time}}_backupiobroker.tar.gz"
+### list of commands to execute before the restore is triggered
+### needed to up-/downgrade npm packages to match the backup
+### example:
+### iob_before_restore_commands:
+###   - "npm i iobroker.js-controller@4.0.15 --production"
+iob_before_restore_commands:
+
+### setup custom certificates
+### the certificates have to be manually set up in the admin config
+iob_use_custom_cert: false
+iob_cert_folder: "{{iob_dir}}/ssl"
+iob_cert_file: "iobroker.crt"
+iob_private_key_file: "iobroker.key"
+
+### required packages
+### leave this as is
+iob_required_packages:
+  - acl
+  - sudo
+  - libcap2-bin
+  - build-essential
+  - gcc
+  - g++
+  - make
+  - libavahi-compat-libdnssd-dev
+  - libudev-dev
+  - libpam0g-dev
+  - pkg-config
+  - git
+  - curl
+  - unzip
+  - libcairo2-dev
+  - libpango1.0-dev
+  - libjpeg-dev
+  - libgif-dev
+  - librsvg2-dev
+  - libpixman-1-dev
+  - net-tools
+  - cmake

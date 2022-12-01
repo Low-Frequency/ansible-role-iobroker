@@ -1,0 +1,6 @@
+---
+- name: restart_iobroker
+  service:
+    name: "{{iob_service}}"
+    state: restarted
+  become: true

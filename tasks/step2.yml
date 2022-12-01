@@ -1,0 +1,60 @@
+---
+- name: Create iobroker group
+  group:
+    name: "{{iob_group}}"
+  become: true
+
+- name: create iobroker user
+  user:
+    name: "{{iob_user}}"
+    group: "{{iob_group}}"
+    groups: "{{iob_groups}}"
+    shell: "/usr/sbin/nologin"
+  become: true
+
+- name: "Add current non root user to group {{iob_group}}"
+  user:
+    name: "{{ansible_user}}"
+    groups:
+      - "{{iob_group}}"
+    append: true
+  become: true
+
+- name: Set sudoers
+  template:
+    src: sudoers.j2
+    dest: "/etc/sudoers.d/iobroker"
+    owner: root
+    group: root
+    mode: 0440
+  become: true
+
+- name: Make sure install folder exists
+  file:
+    path: "{{iob_dir}}"
+    state: directory
+    owner: "{{iob_user}}"
+    group: "{{iob_group}}"
+    mode: 0775
+  become: true
+
+- name: Set default permissions on install folder
+  acl:
+    default: true
+    path: "{{iob_dir}}"
+    entity: "{{iob_group}}"
+    etype: group
+    permissions: rwx
+    recurse: true
+    state: present
+  become: true
+
+- name: Set permissions on install folder
+  acl:
+    path: "{{iob_dir}}"
+    entity: "{{iob_group}}"
+    etype: group
+    permissions: rwx
+    recurse: true
+    state: present
+  become: true
