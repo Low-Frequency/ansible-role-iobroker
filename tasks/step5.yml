@@ -26,11 +26,12 @@
 
 - name: "Execute commands in {{iob_dir}} before restore as user {{iob_user}}"
   shell:
-    cmd: "{{item}}"
+    cmd: "{{item.command}}"
     chdir: "{{iob_dir}}"
   with_items: "{{iob_before_restore_commands}}"
-  become: true
+  become: "{{item.execute_as_root | default(false)}}"
   become_user: "{{iob_user}}"
+  when: item.command is defined
   register: before_restore_command
   changed_when: '"up to date" not in before_restore_command.stdout'
 

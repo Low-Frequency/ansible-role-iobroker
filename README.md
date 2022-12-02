@@ -90,19 +90,21 @@ iob_before_restore_commands:
 A list of commands to execute before restoring the backup. You might need this if the restore doesn't work due to adapter version mismatches. If the playbook fails, it should give you the commands you need to set here. Example:
 ```yaml
 iob_before_restore_commands:
-  - "npm i iobroker.js-controller@4.0.15 --production"
+  - command: "npm i iobroker.js-controller@4.0.15 --production"
+    execute_as_root: true
 ```
 
 ```yaml
 iob_post_install_commands:
 ```
-A list of commands to be executed after the install. Might not be needed, but if you have to execute some commands after the setup and you don't have a playbook for that you might as well use this option.
-Has to be a dictionary in this form:
+A list of commands to be executed after the install. Might not be needed, but if you have to execute some commands after the setup and you don't have a playbook for that you might as well use this option. Example:
 ```yaml
 iob_post_install_commands:
-  - command: "some command"
+  - command: "touch /opt/iobroker/.npmrc"
     execute_as_root: false
 ```
+
+For both `iob_before_restore_commands` and `iob_post_install_commands` the option `execute_as_root` is optional and defaults to `false` if omitted.
 
 ```yaml
 iob_use_custom_cert: false

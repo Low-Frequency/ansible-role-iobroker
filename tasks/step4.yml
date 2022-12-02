@@ -83,5 +83,5 @@
   shell:
     cmd: "{{item.command}}"
   become: "{{item.execute_as_root | default(false)}}"
-  when: item.name is defined
+  when: item.command is defined
   with_items: "{{iob_post_install_commands}}"
