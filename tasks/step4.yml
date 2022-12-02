@@ -82,5 +82,5 @@
 - name: Execute post install commands
   shell:
     cmd: "{{item.command}}"
-  become: "{{item.execute_as_root}}"
+  become: "{{item.execute_as_root | default(false)}}"
   with_items: "{{iob_post_install_commands}}"
