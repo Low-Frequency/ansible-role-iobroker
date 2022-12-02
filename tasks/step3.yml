@@ -1,5 +1,5 @@
 ---
-- name: Setup .npmrc for iob user
+- name: "Setup .npmrc for user {{iob_user}}"
   copy:
     src: npmrc
     dest: "{{iob_dir}}/.npmrc"

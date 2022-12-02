@@ -30,7 +30,10 @@ iob_npm_registry: "https://registry.npmjs.org"
 ### default behaviour is to restore the latest local backup
 iob_restore: false
 iob_use_local_backup: true
+### name of the backup provided in the files folder
 iob_backup_name: "iobroker-backup.tar.gz"
+### backup to be restored. Set to 0 to restore latest backup
+iob_backup_to_restore: "0"
 ### leave this as is
 ### create filename that is registered by iobroker as a valid backup
 iob_date: "{{ansible_date_time.year}}_{{ansible_date_time.month}}_{{ansible_date_time.day}}"
@@ -42,6 +45,14 @@ iob_backup_file: "iobroker_{{iob_date}}-{{iob_time}}_backupiobroker.tar.gz"
 ### iob_before_restore_commands:
 ###   - "npm i iobroker.js-controller@4.0.15 --production"
 iob_before_restore_commands:
+### list of commands to be executed after the install
+### example:
+### iob_post_install_commands:
+###   - command: "chmod 755 /some/directory"
+###     execute_as_root: true
+###   - command: "touch /some/different/directory"
+###     execute_as_root: false
+iob_post_install_commands:
 
 ### setup custom certificates
 ### the certificates have to be manually set up in the admin config

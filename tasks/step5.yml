@@ -24,7 +24,7 @@
   become: true
   when: not iob_use_local_backup | bool
 
-- name: Execute commands before restore
+- name: "Execute commands in {{iob_dir}} before restore as user {{iob_user}}"
   shell:
     cmd: "{{item}}"
     chdir: "{{iob_dir}}"
@@ -33,10 +33,11 @@
   become_user: "{{iob_user}}"
   register: before_restore_command
   changed_when: '"up to date" not in before_restore_command.stdout'
+  when: iob_before_restore_commands | length > 0
 
 - name: Restore backup
   command:
-    cmd: iob restore 0
+    cmd: iobroker restore "{{iob_backup_to_restore}}"
     chdir: "{{iob_dir}}"
   register: restore
   become: true

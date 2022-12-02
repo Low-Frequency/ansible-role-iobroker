@@ -1,5 +1,5 @@
 ---
-- name: setup iob executable
+- name: Create local iobroker executable
   template:
     src: iobroker-cmd.j2
     dest: "{{iob_dir}}/iobroker"
@@ -8,13 +8,13 @@
     mode: 0775
   become: true
 
-- name: Get status of iob file
+- name: "Get information about {{iob_dir}}/iob"
   stat:
     path: "{{iob_dir}}/iob"
   register: iob_file
   become: true
 
-- name: Remove iob regular file
+- name: "Remove {{iob_dir}}/iob if it is a regular file"
   file:
     state: absent
     path: "{{iob_dir}}/iob"
@@ -24,7 +24,7 @@
   become: true
   when: iob_file.stat.isreg | bool
 
-- name: Create iob symlink
+- name: Create local iob executable
   file:
     state: link
     src: "{{iob_dir}}/iobroker"
@@ -34,7 +34,7 @@
     mode: 0777
   become: true
 
-- name: Create iobroker symlinks
+- name: Create global iobroker executables
   file:
     state: link
     src: "{{iob_dir}}/iobroker"
@@ -45,7 +45,7 @@
   become: true
   with_items: "{{iob_cmd_links}}"
 
-- name: Make sure .iobroker folder exists
+- name: "Make sure {{ansible_user_dir}}/.iobroker folder exists"
   file:
     state: directory
     path: "{{ansible_user_dir}}/.iobroker"
@@ -54,7 +54,7 @@
     mode: 0775
   become: true
 
-- name: CLI completions
+- name: Setup CLI completions
   copy:
     src: iobroker_completions
     dest: "{{ansible_user_dir}}/.iobroker/iobroker_completions"
@@ -63,7 +63,7 @@
     mode: 0644
   become: true
 
-- name: NPM command fix
+- name: Setup NPM command fix
   template:
     src: npm-command-fix.j2
     dest: "{{ansible_user_dir}}/.iobroker/npm_command_fix"
@@ -78,3 +78,10 @@
     enabled: true
     state: started
   become: true
+
+- name: Execute post install commands
+  shell:
+    cmd: "{{item.command}}"
+  become: "{{item.execute_as_root}}"
+  with_items: "{{iob_post_install_commands}}"
+  when: iob_post_install_commands | length > 0

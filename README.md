@@ -73,6 +73,11 @@ iob_backup_name: "iobroker-backup.tar.gz"
 The filename of the backup supplied in the `files` folder. You have to change this if you set `iob_use_local_backup: false` or rename your backup file to `iobroker-backup.tar.gz`.
 
 ```yaml
+iob_backup_to_restore: "0"
+```
+The backup that will be restored. `0` will restore the latest backup available. Set it to a specific filename to restore that backup. Refer to the [CLI documentation](https://www.iobroker.net/docu/index-98.htm?page_id=3971&lang=de#iobroker_restore) for possible values.
+
+```yaml
 iob_date: "{{ansible_date_time.year}}_{{ansible_date_time.month}}_{{ansible_date_time.day}}"
 iob_time: "{{ansible_date_time.hour}}_{{ansible_date_time.minute}}_{{ansible_date_time.second}}"
 iob_backup_file: "iobroker_{{iob_date}}-{{iob_time}}_backupiobroker.tar.gz"
@@ -86,6 +91,17 @@ A list of commands to execute before restoring the backup. You might need this i
 ```yaml
 iob_before_restore_commands:
   - "npm i iobroker.js-controller@4.0.15 --production"
+```
+
+```yaml
+iob_post_install_commands:
+```
+A list of commands to be executed after the install. Might not be needed, but if you have to execute some commands after the setup and you don't have a playbook for that you might as well use this option.
+Has to be a dictionary in this form:
+```yaml
+iob_post_install_commands:
+  - command: "some command"
+    execute_as_root: false
 ```
 
 ```yaml

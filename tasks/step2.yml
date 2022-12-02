@@ -12,7 +12,7 @@
     shell: "/usr/sbin/nologin"
   become: true
 
-- name: "Add current non root user to group {{iob_group}}"
+- name: "Add {{ansible_user}} user to group {{iob_group}}"
   user:
     name: "{{ansible_user}}"
     groups:
@@ -20,7 +20,7 @@
     append: true
   become: true
 
-- name: Set sudoers
+- name: Create sudoers file
   template:
     src: sudoers.j2
     dest: "/etc/sudoers.d/iobroker"
