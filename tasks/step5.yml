@@ -33,7 +33,6 @@
   become_user: "{{iob_user}}"
   register: before_restore_command
   changed_when: '"up to date" not in before_restore_command.stdout'
-  when: iob_before_restore_commands | length > 0
 
 - name: Restore backup
   command:

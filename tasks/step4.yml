@@ -84,4 +84,3 @@
     cmd: "{{item.command}}"
   become: "{{item.execute_as_root}}"
   with_items: "{{iob_post_install_commands}}"
-  when: iob_post_install_commands | length > 0
