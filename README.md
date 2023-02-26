@@ -111,6 +111,8 @@ iob_use_custom_cert: false
 ```
 Experimental. If you set this to `true`, the role will create `/opt/ssl` and upload a certificate and a private key supplied in the `files` directory in the playbook folder.
 
+I haven't found out how I can configure ioBroker to use certificates with Ansible yet, but I'll keep testing when I have time.
+
 ```yaml
 iob_cert_folder: "/opt/ssl"
 ```
